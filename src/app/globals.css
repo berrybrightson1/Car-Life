@@ -3,18 +3,40 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-primary: #2563EB;
+    --color-secondary: #10B981;
+    --bg-body: #F3F4F6;
+    --bg-card: #FFFFFF;
+    --text-main: #1F2937;
+    --text-muted: #6B7280;
+    --border-light: #E5E7EB;
+  }
+
+  .dark {
+    --color-primary: #3B82F6;
+    --color-secondary: #34D399;
+    --bg-body: #09090b;
+    --bg-card: #18181b;
+    --text-main: #FAFAFA;
+    --text-muted: #A1A1AA;
+    --border-light: #27272a;
+  }
+
   body {
-    @apply bg-bgBody text-textDark antialiased;
+    @apply bg-bgBody text-textDark antialiased transition-colors duration-300;
   }
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 .no-scrollbar::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }

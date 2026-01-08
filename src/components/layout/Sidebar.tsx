@@ -37,9 +37,10 @@ export default function Sidebar() {
     return (
         <aside className="w-[260px] bg-white h-screen fixed left-0 top-0 border-r border-gray-100 hidden md:flex flex-col p-6 z-50">
             {/* Brand */}
-            <div className="flex items-center gap-3 mb-10 text-primary">
-                <Car size={32} strokeWidth={2.5} />
-                <span className="text-2xl font-extrabold tracking-tight">Car Life</span>
+            <div className="flex items-center gap-3 mb-10 w-full px-2">
+                <Link href="/admin">
+                    <img src="/assets/images/logo-full.png" alt="Car Life Logo" className="w-32 object-contain object-left" />
+                </Link>
             </div>
 
             {/* Menu */}

@@ -1,8 +1,12 @@
 "use client";
 
-import { LayoutDashboard, Car, Calendar, Menu, X, Tag, Ship, BarChart3, Settings, HelpCircle, Plus, Users, FileText } from 'lucide-react';
+import {
+    LayoutDashboard, Car, Calendar, Menu, X, Tag, Ship, BarChart3,
+    Settings, HelpCircle, Plus, Users, FileText, Share2, Globe
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 // Mobile Navigation Component
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -117,15 +121,22 @@ export default function AdminMobileNav() {
                             transition={{ type: "spring", damping: 25, stiffness: 200 }}
                             className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-[70] p-6 pb-32 max-h-[85vh] overflow-y-auto md:hidden"
                         >
+
+
+
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-xl font-bold text-gray-900">Menu</h2>
-                                <button
-                                    onClick={() => setIsMenuOpen(false)}
-                                    className="p-2 bg-gray-100 rounded-full text-gray-500"
-                                >
-                                    <X size={20} />
-                                </button>
+                                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Menu</h2>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="p-2 bg-gray-100 dark:bg-gray-800 rounded-full text-gray-500 dark:text-gray-400"
+                                        aria-label="Close Menu"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                </div>
                             </div>
+
 
                             {/* Add Listing Action */}
                             <Link
@@ -137,14 +148,55 @@ export default function AdminMobileNav() {
                                 Add New Listing
                             </Link>
 
-                            <Link
-                                href="/admin/listings/drafts"
-                                onClick={() => setIsMenuOpen(false)}
-                                className="w-full flex items-center justify-center gap-2 text-gray-600 bg-gray-50 border border-gray-100 py-3 rounded-xl font-bold mb-8 active:scale-95 transition-transform"
-                            >
-                                <FileText size={18} />
-                                View Saved Drafts
-                            </Link>
+                            <div className="flex flex-col gap-3 mb-8">
+                                <Link
+                                    href="/admin/listings/drafts"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="w-full flex items-center justify-center gap-2 text-gray-600 bg-gray-50 border border-gray-100 py-3 rounded-xl font-bold active:scale-95 transition-transform"
+                                >
+                                    <FileText size={18} />
+                                    View Saved Drafts
+                                </Link>
+
+                                <Link
+                                    href="/"
+                                    target="_blank"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="w-full flex items-center justify-center gap-2 text-gray-500 hover:text-blue-600 py-2 rounded-xl text-xs font-bold transition-all hover:bg-blue-50/50"
+                                >
+                                    <Globe size={14} />
+                                    Visit Storefront
+                                </Link>
+
+                                <button
+                                    onClick={() => {
+                                        const url = `${window.location.origin}`;
+                                        if (navigator.share) {
+                                            navigator.share({
+                                                title: 'Car Life Storefront',
+                                                text: 'Check out our latest car inventory!',
+                                                url: url,
+                                            }).catch(console.error);
+                                        } else {
+                                            navigator.clipboard.writeText(url);
+                                            toast.success('Store link copied to clipboard!');
+                                        }
+                                        setIsMenuOpen(false);
+                                    }}
+                                    className="w-full bg-black text-white p-5 rounded-2xl flex flex-col items-center text-center gap-4 active:scale-95 transition-transform shadow-xl shadow-gray-200"
+                                >
+                                    <div>
+                                        <h3 className="font-bold text-lg mb-1">Share Storefront</h3>
+                                        <p className="text-gray-400 text-xs font-medium max-w-[200px] mx-auto leading-relaxed">
+                                            Send your store link to more customers on WhatsApp.
+                                        </p>
+                                    </div>
+                                    <div className="bg-white text-black px-6 py-3 rounded-xl text-sm font-bold flex items-center gap-2 w-full justify-center">
+                                        <Share2 size={16} />
+                                        Share Link
+                                    </div>
+                                </button>
+                            </div>
 
                             {/* Links Grid */}
                             <div className="space-y-8">

@@ -5,18 +5,20 @@ module.exports = {
         "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
         "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     ],
+    darkMode: 'class',
     theme: {
         extend: {
             fontFamily: {
                 sans: ['var(--font-sora)'],
             },
             colors: {
-                primary: '#2563EB',
-                secondary: '#10B981',
-                bgBody: '#F3F4F6',
-                bgCard: '#FFFFFF',
-                textDark: '#1F2937',
-                textGrey: '#6B7280',
+                primary: 'var(--color-primary)',
+                secondary: 'var(--color-secondary)',
+                bgBody: 'var(--bg-body)',
+                bgCard: 'var(--bg-card)',
+                textDark: 'var(--text-main)',
+                textGrey: 'var(--text-muted)',
+                borderLight: 'var(--border-light)',
             },
         },
     },

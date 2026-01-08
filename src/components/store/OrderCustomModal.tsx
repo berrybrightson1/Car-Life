@@ -75,7 +75,7 @@ export default function OrderCustomModal({
 
                         <div className="text-center mb-6">
                             <h2 className="text-2xl font-extrabold text-gray-900">Order Custom</h2>
-                            <p className="text-gray-500 text-sm mt-1">Can't find what you need? We'll import it for you.</p>
+                            <p className="text-gray-500 text-sm mt-1">Can&apos;t find what you need? We&apos;ll import it for you.</p>
                         </div>
 
                         <div className="space-y-4">

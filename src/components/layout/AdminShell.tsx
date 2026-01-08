@@ -3,6 +3,8 @@
 import Sidebar from "@/components/layout/Sidebar";
 import AdminMobileNav from "@/components/layout/AdminMobileNav";
 
+import MikeWidget from "@/components/common/MikeWidget";
+
 export default function AdminShell({ children }: { children: React.ReactNode }) {
     return (
         <div className="flex min-h-screen bg-bgBody">
@@ -12,6 +14,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                 {children}
             </main>
 
+            <MikeWidget />
             <AdminMobileNav />
         </div>
     );

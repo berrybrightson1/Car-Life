@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Download, Copy, Share2, MapPin } from "lucide-react";
+import { X, Download, Copy, MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Listing } from "@/lib/mock-db";
@@ -17,10 +17,10 @@ export default function FlyerModal({
 }) {
     if (!isOpen || !listing) return null;
 
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`https://carlife.gh/store?id=${listing.id}`)}`;
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`https://carlifeghana.app.com/store?id=${listing.id}`)}`;
 
     const handleCopyLink = () => {
-        navigator.clipboard.writeText(`https://carlife.gh/store?id=${listing.id}`);
+        navigator.clipboard.writeText(`https://carlifeghana.app.com/store?id=${listing.id}`);
         toast.success("Link copied to clipboard!");
     };
 
@@ -30,106 +30,97 @@ export default function FlyerModal({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
+                className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4 overflow-y-auto"
                 onClick={onClose}
             >
-                <motion.div
-                    initial={{ scale: 0.95, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.95, opacity: 0 }}
-                    onClick={(e) => e.stopPropagation()}
-                    className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col"
-                >
-                    {/* Header Controls */}
-                    <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                        <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                            <Share2 size={18} className="text-blue-600" />
-                            Share Flyer
-                        </h3>
-                        <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
-                            <X size={20} className="text-gray-500" />
-                        </button>
-                    </div>
+                <div className="w-full max-w-sm flex flex-col gap-6" onClick={(e) => e.stopPropagation()}>
 
-                    {/* FLYER PREVIEW CONTAINER */}
-                    <div className="p-6 bg-gray-200 flex justify-center">
-                        <div id="flyer-card" className="bg-white w-full rounded-2xl overflow-hidden shadow-lg relative aspect-[4/5] flex flex-col">
+                    {/* THE FLYER CARD */}
+                    <motion.div
+                        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                        animate={{ scale: 1, opacity: 1, y: 0 }}
+                        exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                        className="bg-white w-full rounded-[3px] overflow-hidden shadow-2xl relative flex flex-col aspect-[9/16]"
+                        id="flyer-card"
+                    >
+                        {/* HERO SECTION */}
+                        <div className="h-[55%] relative w-full bg-gray-100">
+                            <img
+                                src={listing.images?.[0] || listing.image}
+                                alt={listing.name}
+                                className="w-full h-full object-cover"
+                            />
 
-                            {/* Hero Image */}
-                            <div className="h-1/2 relative">
-                                <img
-                                    src={listing.images[0] || listing.image}
-                                    alt={listing.name}
-                                    className="w-full h-full object-cover"
-                                />
-                                <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-bold border border-white/20">
-                                    {listing.specs.year}
-                                </div>
-                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 pt-10">
-                                    <h2 className="text-white text-xl font-black leading-tight">{listing.name}</h2>
-                                    <div className="flex items-center gap-1 text-gray-300 text-xs mt-1">
-                                        <MapPin size={12} />
-                                        <span>Available in Ghana</span>
-                                    </div>
-                                </div>
+                            {/* Overlay Logo */}
+                            <div className="absolute top-4 left-4 w-32 drop-shadow-lg">
+                                <img src="/assets/images/logo-white.png" alt="Car Life" className="w-full object-contain" />
                             </div>
-
-                            {/* Details & QR */}
-                            <div className="flex-1 p-5 flex flex-col justify-between bg-gradient-to-b from-white to-blue-50">
-
-                                {/* Specs Grid */}
-                                <div className="grid grid-cols-2 gap-3 mb-4">
-                                    <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-100">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase block">Price</span>
-                                        <span className="text-blue-600 font-black text-lg">{listing.price}</span>
-                                    </div>
-                                    <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-100">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase block">Condition</span>
-                                        <span className="text-gray-900 font-bold text-sm truncate">{listing.specs.condition}</span>
-                                    </div>
-                                    <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-100">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase block">Engine</span>
-                                        <span className="text-gray-900 font-bold text-sm truncate">{listing.specs.fuel}</span>
-                                    </div>
-                                    <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-100">
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase block">Trans.</span>
-                                        <span className="text-gray-900 font-bold text-sm truncate">{listing.specs.transmission}</span>
-                                    </div>
-                                </div>
-
-                                {/* Footer / QR */}
-                                <div className="flex items-center justify-between gap-4 mt-auto pt-4 border-t border-gray-100">
-                                    <div className="flex flex-col">
-                                        <span className="text-sm font-extrabold text-gray-900">Scan to View</span>
-                                        <span className="text-[10px] text-gray-500">Visit Car Life Store for details.</span>
-                                    </div>
-                                    <div className="bg-white p-1 rounded-lg shadow-sm border border-gray-100">
-                                        <img src={qrCodeUrl} alt="QR Code" className="w-16 h-16 mix-blend-multiply" />
-                                    </div>
-                                </div>
-                            </div>
-
                         </div>
-                    </div>
 
-                    {/* Actions */}
-                    <div className="p-4 border-t border-gray-100 flex gap-3">
+                        {/* CONTENT SECTION */}
+                        <div className="flex-1 px-8 pt-6 pb-8 bg-white flex flex-col">
+
+                            {/* Title & Price Row */}
+                            <div className="flex justify-between items-start mb-6">
+                                <div className="flex-1 pr-4">
+                                    <h1 className="text-[28px] leading-[1.1] font-bold text-slate-900 tracking-tight">
+                                        {listing.name} {listing.specs.year}
+                                    </h1>
+                                </div>
+                                <div className="bg-[#2563EB] text-white px-5 py-2 rounded-full font-bold text-xl shadow-blue-200/50 shadow-lg whitespace-nowrap">
+                                    ₵ {listing.price}
+                                </div>
+                            </div>
+
+                            {/* Specs Pills */}
+                            <div className="flex flex-wrap gap-2 mb-8">
+                                <span className="bg-slate-50 text-slate-600 px-4 py-2 rounded-lg font-semibold text-sm border border-slate-100 flex items-center gap-2">
+                                    <svg className="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M2 12h20" /></svg>
+                                    {listing.specs.fuel}
+                                </span>
+                                <span className="bg-slate-50 text-slate-600 px-4 py-2 rounded-lg font-semibold text-sm border border-slate-100 flex items-center gap-2">
+                                    <svg className="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
+                                    {listing.specs.transmission}
+                                </span>
+                                <span className="bg-slate-50 text-slate-600 px-4 py-2 rounded-lg font-semibold text-sm border border-slate-100">
+                                    Details {listing.specs.year}
+                                </span>
+                            </div>
+
+                            {/* Footer Area */}
+                            <div className="mt-auto border-t border-slate-100 pt-6 flex items-center justify-between">
+                                {/* QR Code */}
+                                <div className="bg-white p-1 rounded-xl border border-slate-100 shadow-sm w-20 h-20 flex-shrink-0">
+                                    <img src={qrCodeUrl} alt="Scan to Order" className="w-full h-full" />
+                                </div>
+
+                                {/* Call to Action Text */}
+                                <div className="text-right flex-1 pl-4">
+                                    <h3 className="text-[#2563EB] font-bold text-2xl mb-1">Scan to Order</h3>
+                                    <p className="text-slate-900 font-bold text-xs mb-1">Quick & Easy WhatsApp Checkout</p>
+                                    <p className="text-slate-400 text-[10px] font-medium tracking-wide">carlifeghana.app.com</p>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    {/* ACTIONS (Outside Card) */}
+                    <div className="flex gap-3 justify-center">
                         <button
                             onClick={handleCopyLink}
-                            className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-700 font-bold text-sm hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                            className="bg-white/10 text-white hover:bg-white/20 px-6 py-3 rounded-xl font-semibold backdrop-blur-md transition-colors flex items-center gap-2 border border-white/10"
                         >
-                            <Copy size={16} />
-                            Copy Link
+                            <Copy size={18} /> Copy Link
                         </button>
                         <button
-                            className="flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 flex items-center justify-center gap-2"
-                            onClick={() => toast.info("Screenshot this card to share!")}
+                            onClick={onClose}
+                            className="bg-white/10 text-white hover:bg-white/20 px-6 py-3 rounded-xl font-semibold backdrop-blur-md transition-colors flex items-center gap-2 border border-white/10"
                         >
-                            <Download size={16} />
-                            Save Image
+                            <X size={18} /> Close
                         </button>
                     </div>
-                </motion.div>
+
+                </div>
             </motion.div>
         </AnimatePresence>
     );

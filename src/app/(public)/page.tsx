@@ -45,7 +45,7 @@ export default function StorePage() {
         <div className="min-h-screen bg-gray-50/50">
 
             {/* Hero Section */}
-            <div className="relative bg-white pt-24 pb-32 rounded-b-[40px] shadow-sm overflow-hidden mb-6">
+            <div className="relative bg-white pt-8 pb-16 rounded-b-[40px] shadow-sm overflow-hidden mb-2">
                 {/* Background Gradient */}
                 <motion.div
                     className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-500/30 to-cyan-300/20"
@@ -67,13 +67,14 @@ export default function StorePage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <span className="inline-block px-4 py-1.5 rounded-full bg-blue-50/80 backdrop-blur-sm text-blue-600 font-bold text-xs tracking-wide mb-6 border border-blue-100">
+                        <span className="inline-block px-4 py-1.5 rounded-full bg-blue-50/80 backdrop-blur-sm text-blue-600 font-bold text-xs tracking-wide mb-3 border border-blue-100">
                             TRUSTED BY 1000+ GHANAIANS 🇬🇭
                         </span>
-                        <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-gray-900 mb-6 leading-tight drop-shadow-sm">
-                            Find Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Dream Ride</span>
+                        <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-gray-900 mb-2 leading-tight drop-shadow-sm">
+                            Find Your
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 block md:inline"> Dream Store</span>
                         </h1>
-                        <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto font-medium leading-relaxed mb-8">
+                        <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto font-medium leading-relaxed mb-6">
                             Import custom vehicles directly to Ghana. Simple, transparent, and delivered to your doorstep.
                         </p>
 
@@ -84,7 +85,7 @@ export default function StorePage() {
 
 
             {/* Floating Search Bar */}
-            <div className="sticky top-4 z-30 px-4 -mt-16 mb-8">
+            <div className="sticky top-4 z-30 px-4 -mt-12 mb-6">
                 <div className="max-w-3xl mx-auto shadow-2xl shadow-blue-900/10 rounded-3xl bg-white/80 backdrop-blur-xl border border-white/20 p-2 ring-1 ring-gray-200/50 space-y-3">
                     <StoreSearch
                         value={searchQuery}
@@ -137,7 +138,7 @@ export default function StorePage() {
                         View All Inventory
                     </button>
                     <p className="mt-4 text-xs text-gray-400">
-                        Don't see what you want? Use the <span className="font-bold text-gray-600">Order Custom</span> button.
+                        Don&apos;t see what you want? Use the <span className="font-bold text-gray-600">Order Custom</span> button.
                     </p>
                 </div>
             </div>

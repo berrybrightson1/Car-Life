@@ -28,9 +28,9 @@ export default function IOSNavigationStack({
 
     // Mobile Animations
     const transformInput = [0, windowWidth > 0 ? windowWidth : 1];
-    // On mobile: Scale down background. On desktop: Keep scale 1.
-    const scale = useTransform(x, transformInput, [isDesktop ? 1 : 0.93, 1]);
-    const borderRadius = useTransform(x, transformInput, [isDesktop ? 0 : 24, 0]);
+    // Disable scaling effect for cleaner look
+    const scale = useTransform(x, transformInput, [1, 1]);
+    const borderRadius = useTransform(x, transformInput, [0, 0]);
 
     const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
         const DRAG_THRESHOLD = windowWidth * (isDesktop ? 0.2 : 0.3);
@@ -42,7 +42,8 @@ export default function IOSNavigationStack({
     };
 
     return (
-        <div className="relative flex-1 w-full h-full overflow-hidden bg-black">
+        // Changed bg-black to bg-bgBody (or gray-50) to remove black outline
+        <div className="relative flex-1 w-full h-full overflow-hidden bg-gray-50">
             {/* BACKGROUND LAYER */}
             <motion.div
                 className="absolute inset-0 z-0 origin-center overflow-y-auto overflow-x-hidden bg-gray-50"
@@ -50,9 +51,9 @@ export default function IOSNavigationStack({
                 animate={
                     detailPage
                         ? {
-                            scale: isDesktop ? 1 : 0.93,
-                            filter: isDesktop ? "brightness(1)" : "brightness(0.8)",
-                            borderRadius: isDesktop ? "0px" : "24px"
+                            scale: 1, // Force full size
+                            filter: isDesktop ? "brightness(1)" : "brightness(0.8)", // Keep dimming if desired, or remove? User said "clean". Let's keep dimming for focus but remove scale.
+                            borderRadius: "0px" // Remove radius
                         }
                         : { scale: 1, filter: "brightness(1)", borderRadius: "0px" }
                 }

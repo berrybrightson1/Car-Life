@@ -79,12 +79,79 @@ export default function CreatorStudioPage() {
         toast.success("Draft saved to 'Drafts' folder!");
     };
 
-    const handlePublish = () => {
-        MockDB.saveListing(data);
-        toast.success("Listing Published to Marketplace!");
-        setData(INITIAL_DATA);
-        localStorage.removeItem('cl_current_edit');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Helper to compress images for localStorage
+    const compressImage = async (blobUrl: string): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = blobUrl;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return reject('No canvas context');
+
+                // Max dimensions
+                const MAX_WIDTH = 800;
+                const MAX_HEIGHT = 800;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+                // Compress to JPEG 0.6
+                resolve(canvas.toDataURL('image/jpeg', 0.6));
+            };
+            img.onerror = (err) => reject(err);
+        });
+    };
+
+    const handlePublish = async () => {
+        const toastId = toast.loading("Processing images...");
+
+        try {
+            // Convert and compress images
+            const processedImages = await Promise.all(data.images.map(async (img) => {
+                if (img.startsWith('blob:')) {
+                    try {
+                        return await compressImage(img);
+                    } catch (e) {
+                        console.error("Failed to compress image:", e);
+                        return img; // Fallback
+                    }
+                }
+                return img;
+            }));
+
+            MockDB.saveListing({ ...data, images: processedImages });
+            toast.dismiss(toastId);
+            toast.success("Listing Published to Marketplace!");
+            setData(INITIAL_DATA);
+            localStorage.removeItem('cl_current_edit');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        } catch (error: any) {
+            console.error("Publish Error:", error);
+            toast.dismiss(toastId);
+            if (error.name === 'QuotaExceededError' || error.message?.includes('exceeded')) {
+                toast.error("Storage Full! Images are too big.", {
+                    description: "Try removing some photos or using smaller ones."
+                });
+            } else {
+                toast.error("Failed to publish listing.");
+            }
+        }
     };
 
     const handleAddAnother = () => {

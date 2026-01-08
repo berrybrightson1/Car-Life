@@ -35,7 +35,7 @@ export default function AboutPage() {
                                 </span>
                             </h1>
                             <p className="text-lg md:text-xl text-gray-500 mb-8 leading-relaxed max-w-lg">
-                                We aren't just a dealership; we are your direct link to global automotive inventory. No middlemen, no mystery markups, just transparent imports.
+                                We aren&apos;t just a dealership; we are your direct link to global automotive inventory. No middlemen, no mystery markups, just transparent imports.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <button className="bg-gray-900 text-white px-8 py-4 rounded-xl font-bold hover:bg-black transition-colors shadow-lg shadow-gray-200">
@@ -122,7 +122,7 @@ export default function AboutPage() {
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="text-center max-w-3xl mx-auto mb-16">
                         <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">Why Ghanaians Trust Us</h2>
-                        <p className="text-gray-500 text-lg">We don't just sell cars; we sell peace of mind. Here is why our customers keep coming back.</p>
+                        <p className="text-gray-500 text-lg">We don&apos;t just sell cars; we sell peace of mind. Here is why our customers keep coming back.</p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8">

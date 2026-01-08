@@ -122,7 +122,7 @@ export default function DescriptionGenerator({ value, onChange, carName }: Descr
             {transcript && (
                 <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 mb-2">
                     <p className="text-xs font-semibold text-gray-500 mb-1">Transcript Preview:</p>
-                    <p className="text-sm text-gray-700 italic">"{transcript}"</p>
+                    <p className="text-sm text-gray-700 italic">&quot;{transcript}&quot;</p>
                     <div className="flex justify-end gap-2 mt-2">
                         <button
                             onClick={confirmTranscript}

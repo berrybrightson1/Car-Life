@@ -20,7 +20,7 @@ export default function HowItWorksPage() {
                         How It <span className="text-blue-600">Works</span>
                     </h1>
                     <p className="text-lg text-gray-500 leading-relaxed">
-                        Importing a car shouldn't be a mystery. Here is our simple 4-step process to get you behind the wheel.
+                        Importing a car shouldn&apos;t be a mystery. Here is our simple 4-step process to get you behind the wheel.
                     </p>
                 </motion.div>
             </div>
@@ -148,7 +148,7 @@ export default function HowItWorksPage() {
                     <div className="relative z-10">
                         <h2 className="text-3xl md:text-5xl font-black mb-6">Ready to find your dream car?</h2>
                         <p className="text-blue-100 text-lg md:text-xl max-w-2xl mx-auto mb-10">
-                            Start browsing our inventory or tell us exactly what you want, and we'll find it for you at the best auction price.
+                            Start browsing our inventory or tell us exactly what you want, and we&apos;ll find it for you at the best auction price.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <Link href="/" className="bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition-colors shadow-lg">

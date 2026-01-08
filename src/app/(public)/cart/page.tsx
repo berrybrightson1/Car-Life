@@ -19,7 +19,7 @@ export default function CartPage() {
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">Your Garage is Empty</h2>
                 <p className="text-gray-500 text-sm max-w-xs">
-                    You haven't added any cars to your cart yet. Browse our inventory to find your dream ride.
+                    You haven&apos;t added any cars to your cart yet. Browse our inventory to find your dream ride.
                 </p>
 
                 <Link href="/" className="px-8 py-3 bg-black text-white font-bold rounded-xl shadow-lg active:scale-95 transition-transform">

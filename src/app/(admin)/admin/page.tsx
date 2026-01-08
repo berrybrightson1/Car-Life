@@ -30,8 +30,9 @@ export default function AdminDashboard() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-1">Dashboard</h1>
-                    <p className="text-gray-500">Overview of your dealership's performance.</p>
+                    <p className="text-gray-500">Overview of your dealership&apos;s performance.</p>
                 </div>
+
                 <div className="flex gap-3">
                     <Link
                         href="/admin/listings/new"
@@ -150,7 +151,7 @@ export default function AdminDashboard() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 

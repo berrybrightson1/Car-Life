@@ -16,6 +16,10 @@ export const metadata: Metadata = {
     description: "Advanced automotive logistics and retail platform.",
 };
 
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
+
+// ...
+
 export default function RootLayout({
     children,
 }: Readonly<{
@@ -24,10 +28,12 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <body className={`${sora.variable} font-sans`} suppressHydrationWarning>
-                <CurrencyProvider>
-                    {children}
-                    <Toaster position="top-center" richColors />
-                </CurrencyProvider>
+                <ThemeProvider>
+                    <CurrencyProvider>
+                        {children}
+                        <Toaster position="top-center" richColors />
+                    </CurrencyProvider>
+                </ThemeProvider>
             </body>
         </html>
     );
