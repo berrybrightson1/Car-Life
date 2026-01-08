@@ -102,9 +102,7 @@ export default function ListingsTable({ listings, onEdit, onDelete, onUpdate }: 
 
                                     <div className="flex items-end justify-between">
                                         <div className="font-bold text-lg text-gray-900">
-                                            {typeof item.price === 'number'
-                                                ? item.price.toLocaleString('en-US', { style: 'currency', currency: 'USD' }).replace('.00', '')
-                                                : item.price}
+                                            {item.price}
                                         </div>
                                         <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wide ${STATUS_STYLES[item.status as keyof typeof STATUS_STYLES] || 'bg-gray-100 text-gray-500'}`}>
                                             {item.status}
