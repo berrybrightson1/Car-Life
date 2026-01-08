@@ -48,7 +48,7 @@ const INITIAL_DATA: ListingData = {
     images: [],
 };
 
-export default function CreatorStudioPage() {
+const CreateListingContent = () => {
     const [data, setData] = useState<ListingData>(INITIAL_DATA);
     const [mobileView, setMobileView] = useState<'edit' | 'preview' | 'drafts'>('edit');
 
@@ -248,5 +248,15 @@ export default function CreatorStudioPage() {
             </div>
 
         </div>
+    );
+};
+
+import { Suspense } from "react";
+
+export default function NewListingPage() {
+    return (
+        <Suspense fallback={<div className="p-8 text-center text-gray-500">Loading editor...</div>}>
+            <CreateListingContent />
+        </Suspense>
     );
 }

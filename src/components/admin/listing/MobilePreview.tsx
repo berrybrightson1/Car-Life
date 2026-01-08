@@ -12,10 +12,14 @@ export default function MobilePreview({ data }: { data: ListingData }) {
         price: data.price || "0",
         image: data.images[0] || "https://images.unsplash.com/photo-1560156713-ef3765e10085?auto=format&fit=crop&q=80&w=800", // Placeholder
         status: data.status,
+        type: data.type || 'Luxury',
+        images: data.images.length > 0 ? data.images : ["https://images.unsplash.com/photo-1560156713-ef3765e10085?auto=format&fit=crop&q=80&w=800"],
+        dateAdded: new Date().toLocaleDateString(),
         specs: {
             year: data.specs.year,
             fuel: data.specs.fuel,
-            transmission: data.specs.transmission
+            transmission: data.specs.transmission,
+            condition: data.specs.condition
         }
     };
 

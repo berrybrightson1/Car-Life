@@ -126,9 +126,7 @@ export default function ListingsTable({ listings, onEdit, onDelete, onUpdate }: 
 
                                 {/* Price */}
                                 <div className="font-bold text-gray-900">
-                                    {typeof item.price === 'number'
-                                        ? item.price.toLocaleString('en-US', { style: 'currency', currency: 'USD' }).replace('.00', '')
-                                        : item.price}
+                                    {item.price}
                                 </div>
 
                                 {/* Status */}
