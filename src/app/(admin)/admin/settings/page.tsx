@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Bell,
     Lock,
@@ -16,18 +16,17 @@ import {
 import Link from "next/link";
 import { toast } from "sonner";
 
-// Mock Data for "System Activity"
-const ACTIVITY_LOG = [
-    { id: 1, user: "Admin User", action: "Published new listing", target: "Toyota Hilux 2024", time: "2 mins ago" },
-    { id: 2, user: "System", action: "Backup completed", target: "Database", time: "1 hour ago" },
-    { id: 3, user: "Sales Team", action: "Closed deal", target: "#DL-8821", time: "3 hours ago" },
-    { id: 4, user: "Admin User", action: "Updated security", target: "2FA Enabled", time: "Yesterday" },
-];
+import { getSystemActivity } from "@/app/actions/system";
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState("general");
     const [currency, setCurrency] = useState("GHS");
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const [activityLog, setActivityLog] = useState<any[]>([]);
+
+    useEffect(() => {
+        getSystemActivity().then(setActivityLog);
+    }, []);
 
     return (
         <div className="flex flex-col xl:flex-row h-screen overflow-hidden bg-gray-50 box-border">
@@ -50,8 +49,8 @@ export default function SettingsPage() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${activeTab === tab.id
-                                        ? "bg-black text-white shadow-md"
-                                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                                    ? "bg-black text-white shadow-md"
+                                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                                     }`}
                             >
                                 <tab.icon size={16} />
@@ -228,14 +227,16 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="flex-1 overflow-y-auto pr-2 space-y-6">
-                        {ACTIVITY_LOG.map((log) => (
+                        {activityLog.length === 0 ? (
+                            <p className="text-xs text-center text-gray-400 py-4">Loading activity...</p>
+                        ) : activityLog.map((log) => (
                             <div key={log.id} className="relative pl-6 before:absolute before:left-[7px] before:top-2 before:bottom-[-24px] before:w-[2px] before:bg-gray-100 last:before:hidden">
                                 <div className="absolute left-0 top-1 w-4 h-4 rounded-full border-2 border-white bg-blue-100 ring-1 ring-blue-50"></div>
 
                                 <p className="text-xs font-bold text-gray-900">{log.action}</p>
                                 <p className="text-[11px] text-gray-500 font-medium truncate mb-1">{log.target}</p>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-[10px] text-gray-400">{log.time}</span>
+                                    <span className="text-[10px] text-gray-400">{new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                     <span className="w-1 h-1 rounded-full bg-gray-300"></span>
                                     <span className="text-[10px] text-blue-600 font-bold">{log.user}</span>
                                 </div>
