@@ -1,6 +1,7 @@
 "use client";
 
-import { MockDB } from "@/lib/mock-db";
+import { useState, useEffect } from "react";
+import { getDashboardStats } from "@/app/actions/stats";
 import { DollarSign, TrendingUp, ShoppingBag, Users, Calendar } from "lucide-react";
 // Removed recharts to avoid build errors if package is missing
 // Using custom SVG/CSS implementation for lightweight charts
@@ -27,7 +28,15 @@ const MAKE_DATA = [
 ];
 
 export default function StatisticsPage() {
-    const stats = MockDB.getStats();
+    const [stats, setStats] = useState({ total: 0, pending: 0, revenue: 0, inventory: 0 });
+
+    useEffect(() => {
+        const loadStats = async () => {
+            const data = await getDashboardStats();
+            setStats(data);
+        };
+        loadStats();
+    }, []);
 
     return (
         <div className="p-6 md:p-10 max-w-[1600px] mx-auto min-h-screen bg-gray-50/50 pb-32">
@@ -142,7 +151,7 @@ function StatCard({ title, value, trend, icon: Icon, color }: any) {
                 </div>
                 {trend && (
                     <span className={`text-xs font-bold px-2 py-1 rounded-full ${isPositive ? 'bg-green-100 text-green-700' :
-                            isStable ? 'bg-gray-100 text-gray-600' : 'bg-red-100 text-red-700'
+                        isStable ? 'bg-gray-100 text-gray-600' : 'bg-red-100 text-red-700'
                         }`}>
                         {trend}
                     </span>
