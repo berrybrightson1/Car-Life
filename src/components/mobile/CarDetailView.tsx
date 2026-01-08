@@ -5,10 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Share2, Ship, Leaf, Fuel, Gauge, Calendar, Info, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import CarPlaceholder from "@/components/ui/CarPlaceholder";
-import { Listing } from "@/lib/mock-db";
+// import { Listing } from "@/lib/mock-db"; // Removed
 
 interface CarDetailViewProps {
-    car: Listing;
+    car: any; // Prisma Car
     onBack: () => void;
 }
 
@@ -17,7 +17,8 @@ const WHATSAPP_NUMBER = "233551171353";
 export default function CarDetailView({ car, onBack }: CarDetailViewProps) {
 
     const [activeImageIndex, setActiveImageIndex] = useState(0);
-    const images = car.images && car.images.length > 0 ? car.images : [car.image];
+    const images = car.images && car.images.length > 0 ? car.images : [];
+    // Fallback if no images, handle in UI using Placeholder or empty
 
     // Reset index when car changes
     useEffect(() => {
@@ -25,15 +26,19 @@ export default function CarDetailView({ car, onBack }: CarDetailViewProps) {
     }, [car.id]);
 
     const handleNext = () => {
+        if (images.length === 0) return;
         setActiveImageIndex((prev) => (prev + 1) % images.length);
     };
 
     const handlePrev = () => {
+        if (images.length === 0) return;
         setActiveImageIndex((prev) => (prev - 1 + images.length) % images.length);
     };
 
+    const title = `${car.make} ${car.model} ${car.year}`;
+
     const handleCheckout = () => {
-        const message = `Hello Car Life, I am interested in the ${car.name} listed for ${car.price}.Is it available ? `;
+        const message = `Hello Car Life, I am interested in the ${title} listed for ${car.price}. Is it available?`;
         window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
     };
 
@@ -48,7 +53,7 @@ export default function CarDetailView({ car, onBack }: CarDetailViewProps) {
                 >
                     <ArrowLeft size={24} className="text-gray-900" />
                 </button>
-                <span className="font-semibold text-sm opacity-0 animate-fade-in">{car.name}</span>
+                <span className="font-semibold text-sm opacity-0 animate-fade-in">{title}</span>
                 <button
                     className="p-2 -mr-2 rounded-full hover:bg-gray-100 active:scale-95 transition-transform"
                     aria-label="Share this listing"
@@ -71,7 +76,7 @@ export default function CarDetailView({ car, onBack }: CarDetailViewProps) {
                         {images[activeImageIndex] ? (
                             <img
                                 src={images[activeImageIndex]}
-                                alt={`${car.name} - View ${activeImageIndex + 1}`}
+                                alt={`${title} - View ${activeImageIndex + 1}`}
                                 className="w-full h-full object-contain"
                             />
                         ) : (
@@ -139,7 +144,7 @@ export default function CarDetailView({ car, onBack }: CarDetailViewProps) {
                     <span className="inline-block px-3 py-1 bg-blue-50 text-primary text-[11px] font-bold rounded-full mb-3">
                         VERIFIED LISTING
                     </span>
-                    <h1 className="text-3xl font-extrabold text-gray-900 leading-tight mb-2">{car.name}</h1>
+                    <h1 className="text-3xl font-extrabold text-gray-900 leading-tight mb-2">{title}</h1>
                     <div className="mt-2 inline-flex bg-blue-600 text-white px-6 py-3 rounded-full shadow-lg shadow-blue-200">
                         <h2 className="text-2xl font-extrabold tracking-wide">₵ {car.price}</h2>
                     </div>
@@ -164,22 +169,22 @@ export default function CarDetailView({ car, onBack }: CarDetailViewProps) {
                     <div className="p-4 bg-gray-50 rounded-2xl flex flex-col gap-2">
                         <Calendar className="text-gray-400" size={20} />
                         <span className="text-xs text-gray-500 font-medium">Year</span>
-                        <span className="font-bold text-gray-900">{car.specs.year}</span>
+                        <span className="font-bold text-gray-900">{car.year}</span>
                     </div>
                     <div className="p-4 bg-gray-50 rounded-2xl flex flex-col gap-2">
                         <Fuel className="text-gray-400" size={20} />
                         <span className="text-xs text-gray-500 font-medium">Fuel Type</span>
-                        <span className="font-bold text-gray-900">{car.specs.fuel}</span>
+                        <span className="font-bold text-gray-900">{car.fuel}</span>
                     </div>
                     <div className="p-4 bg-gray-50 rounded-2xl flex flex-col gap-2">
                         <Gauge className="text-gray-400" size={20} />
                         <span className="text-xs text-gray-500 font-medium">Transmission</span>
-                        <span className="font-bold text-gray-900">{car.specs.transmission}</span>
+                        <span className="font-bold text-gray-900">{car.transmission}</span>
                     </div>
                     <div className="p-4 bg-gray-50 rounded-2xl flex flex-col gap-2">
                         <Info className="text-gray-400" size={20} />
                         <span className="text-xs text-gray-500 font-medium">Condition</span>
-                        <span className="font-bold text-gray-900">{car.specs.condition}</span>
+                        <span className="font-bold text-gray-900">{car.condition}</span>
                     </div>
                 </div>
 

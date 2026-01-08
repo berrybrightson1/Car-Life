@@ -5,19 +5,23 @@ import { Ship, Leaf, Fuel, Gauge, Share2 } from "lucide-react";
 import Image from "next/image";
 import CarPlaceholder from "@/components/ui/CarPlaceholder";
 import { useCurrency } from "@/context/CurrencyContext";
-import { Listing } from "@/lib/mock-db";
+// import { Listing } from "@/lib/mock-db"; // Removed
 import ImageWithError from "@/components/ui/ImageWithError";
 
 const WHATSAPP_NUMBER = "233551171353";
 
-export default function FeedCard({ car, onClick }: { car: Listing; onClick?: () => void }) {
+export default function FeedCard({ car, onClick }: { car: any; onClick?: () => void }) {
 
     const { convertPrice, symbol } = useCurrency(); // Hook
 
     const handleCheckout = () => {
-        const message = `Hello Car Life, I am interested in the ${car.name} listed for ${car.price}. Is it available?`;
+        const title = `${car.make} ${car.model} ${car.year}`;
+        const message = `Hello Car Life, I am interested in the ${title} listed for ${car.price}. Is it available?`;
         window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
     };
+
+    const title = `${car.make} ${car.model}`;
+    const image = car.images && car.images.length > 0 ? car.images[0] : null;
 
     return (
         <motion.div
@@ -64,7 +68,7 @@ export default function FeedCard({ car, onClick }: { car: Listing; onClick?: () 
             {/* Content */}
             <div className="px-2">
                 <div className="flex justify-between items-start mb-2">
-                    <h2 className="text-lg font-bold text-gray-900 leading-tight w-[65%] line-clamp-2">{car.name}</h2>
+                    <h2 className="text-lg font-bold text-gray-900 leading-tight w-[65%] line-clamp-2">{title}</h2>
                     <div className="text-right flex-shrink-0 ml-4">
                         <div className={`${car.status === 'sold' ? 'bg-gray-200 text-gray-500' : 'bg-blue-600 text-white shadow-blue-200'} px-4 py-2 rounded-full shadow-md transition-colors`}>
                             <span className="block text-sm font-extrabold tracking-wide whitespace-nowrap">{symbol} {convertPrice(car.price)}</span>
@@ -75,13 +79,13 @@ export default function FeedCard({ car, onClick }: { car: Listing; onClick?: () 
                 {/* Specs Pills */}
                 <div className="flex flex-wrap gap-2 mb-6">
                     <span className="px-3 py-1.5 bg-gray-50 rounded-lg text-[11px] font-semibold text-gray-500 flex items-center gap-1.5 border border-gray-100">
-                        <Fuel size={12} /> {car.specs.fuel}
+                        <Fuel size={12} /> {car.fuel}
                     </span>
                     <span className="px-3 py-1.5 bg-gray-50 rounded-lg text-[11px] font-semibold text-gray-500 flex items-center gap-1.5 border border-gray-100">
-                        <Gauge size={12} /> {car.specs.transmission}
+                        <Gauge size={12} /> {car.transmission}
                     </span>
                     <span className="px-3 py-1.5 bg-gray-50 rounded-lg text-[11px] font-semibold text-gray-500 flex items-center gap-1.5 border border-gray-100">
-                        Details {car.specs.year}
+                        Details {car.year}
                     </span>
                 </div>
 

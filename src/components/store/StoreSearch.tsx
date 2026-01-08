@@ -2,7 +2,7 @@
 
 import { Search, SlidersHorizontal } from "lucide-react";
 
-import { CAR_CATEGORIES } from "@/lib/mock-db";
+import { CAR_CATEGORIES } from "@/lib/utils";
 
 export default function StoreSearch({
     value,

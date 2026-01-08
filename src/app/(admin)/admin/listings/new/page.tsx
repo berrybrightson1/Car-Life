@@ -8,16 +8,17 @@ import { toast } from "sonner";
 import MobilePreview from "@/components/admin/listing/MobilePreview";
 import ListingForm from "@/components/admin/listing/ListingForm";
 import MobileAssistiveTouch from "@/components/admin/listing/MobileAssistiveTouch";
-import { CarCategory } from "@/lib/mock-db";
 import { createListing } from "@/app/actions/listings";
+import { compressImage } from "@/lib/utils";
 
+// Define strict types for the component state
 export type ListingData = {
     make: string;
     model: string;
     description: string;
     price: string;
     currency: 'GHS' | 'USD';
-    type: CarCategory;
+    type: string; // Changed from custom type for flexibility
     specs: {
         year: string;
         fuel: string;
@@ -27,7 +28,7 @@ export type ListingData = {
         color: string;
     };
     status: 'shipping' | 'arrived';
-    images: string[]; // URLs
+    images: string[]; // Preview URLs
 };
 
 const INITIAL_DATA: ListingData = {
@@ -51,134 +52,118 @@ const INITIAL_DATA: ListingData = {
 
 const CreateListingContent = () => {
     const [data, setData] = useState<ListingData>(INITIAL_DATA);
+    const [uploadFiles, setUploadFiles] = useState<File[]>([]); // Store real files for upload
     const [mobileView, setMobileView] = useState<'edit' | 'preview' | 'drafts'>('edit');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // Restore draft if requested
+    // Restore draft if requested (Logic preserved)
     useEffect(() => {
         if (searchParams.get('restore') === 'true') {
             const saved = localStorage.getItem('cl_current_edit');
             if (saved) {
-                setData(JSON.parse(saved));
-                // Clear the temp storage so refresh doesn't keep restoring old state unexpectedly? 
-                // Actually keep it for safety until explicit clear.
+                const parsed = JSON.parse(saved);
+                setData(parsed);
             }
         }
     }, [searchParams]);
 
     const handleSaveDraft = () => {
         const drafts = JSON.parse(localStorage.getItem('cl_drafts') || '[]');
-        // Update existing if ID match or create new
         const newDraft = { ...data, id: (data as any).id || Date.now(), savedAt: new Date().toISOString() };
-
-        // Remove old version of this draft if exists
         const filtered = drafts.filter((d: any) => d.id !== newDraft.id);
-
         localStorage.setItem('cl_drafts', JSON.stringify([newDraft, ...filtered]));
         toast.success("Draft saved to 'Drafts' folder!");
     };
 
-    // Helper to compress images for localStorage
-    const compressImage = async (blobUrl: string): Promise<string> => {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.src = blobUrl;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                if (!ctx) return reject('No canvas context');
+    // New Handler for File Selection with Compression
+    const handleFilesAdded = async (files: File[]) => {
+        try {
+            toast.loading("Compressing images...", { id: "compress-toast" }); // Add ID to dismiss
 
-                // Max dimensions
-                const MAX_WIDTH = 800;
-                const MAX_HEIGHT = 800;
-                let width = img.width;
-                let height = img.height;
+            const compressedFiles = await Promise.all(
+                files.map(async (file) => {
+                    return await compressImage(file);
+                })
+            );
 
-                if (width > height) {
-                    if (width > MAX_WIDTH) {
-                        height *= MAX_WIDTH / width;
-                        width = MAX_WIDTH;
-                    }
-                } else {
-                    if (height > MAX_HEIGHT) {
-                        width *= MAX_HEIGHT / height;
-                        height = MAX_HEIGHT;
-                    }
-                }
+            // Update state with new files appended
+            setUploadFiles(prev => [...prev, ...compressedFiles]);
 
-                canvas.width = width;
-                canvas.height = height;
-                ctx.drawImage(img, 0, 0, width, height);
-                // Compress to JPEG 0.6
-                resolve(canvas.toDataURL('image/jpeg', 0.6));
-            };
-            img.onerror = (err) => reject(err);
-        });
+            // Create preview URLs
+            const newPreviewUrls = compressedFiles.map(file => URL.createObjectURL(file));
+            setData(prev => ({
+                ...prev,
+                images: [...prev.images, ...newPreviewUrls]
+            }));
+
+            toast.dismiss("compress-toast");
+            toast.success(`Added ${files.length} images (Optimized)`);
+        } catch (error) {
+            console.error("Compression error:", error);
+            toast.error("Failed to process images");
+        }
     };
 
     const handlePublish = async () => {
-        const toastId = toast.loading("Processing images...");
+        if (!data.make || !data.model || !data.price) {
+            toast.error("Please fill in Make, Model and Price");
+            return;
+        }
+
+        setIsSubmitting(true);
+        const toastId = toast.loading("Publishing listing...");
 
         try {
-            // Convert and compress images
-            const processedImages = await Promise.all(data.images.map(async (img) => {
-                if (img.startsWith('blob:')) {
-                    try {
-                        return await compressImage(img);
-                    } catch (e) {
-                        console.error("Failed to compress image:", e);
-                        return img; // Fallback
-                    }
-                }
-                return img;
-            }));
+            const formData = new FormData();
+            formData.append("make", data.make);
+            formData.append("model", data.model);
+            formData.append("year", data.specs.year);
+            formData.append("price", data.price.replace(/[^0-9.]/g, ''));
+            formData.append("description", data.description);
+            formData.append("category", data.type);
+            formData.append("condition", data.specs.condition);
+            formData.append("fuel", data.specs.fuel);
+            formData.append("transmission", data.specs.transmission);
+            formData.append("color", data.specs.color);
+            formData.append("mileage", data.specs.mileage);
 
-            // Save to database
-            await createListing({
-                make: data.make,
-                model: data.model,
-                year: parseInt(data.specs.year),
-                price: parseFloat(data.price.replace(/[^0-9.]/g, '')),
-                images: processedImages,
-                status: data.status,
+            // Append images
+            uploadFiles.forEach((file) => {
+                formData.append("images", file);
             });
 
+            await createListing(formData);
+
             toast.dismiss(toastId);
-            toast.success("Listing Published to Marketplace!");
+            toast.success("Listing Published Successfully!");
+
+            // Cleanup
+            setUploadFiles([]);
             setData(INITIAL_DATA);
             localStorage.removeItem('cl_current_edit');
+
+            // Redirect or Scroll
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            router.refresh();
 
         } catch (error: any) {
             console.error("Publish Error:", error);
             toast.dismiss(toastId);
-            if (error.name === 'QuotaExceededError' || error.message?.includes('exceeded')) {
-                toast.error("Storage Full! Images are too big.", {
-                    description: "Try removing some photos or using smaller ones."
-                });
-            } else {
-                toast.error("Failed to publish listing.");
-            }
+            toast.error("Failed to publish listing: " + error.message);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     const handleAddAnother = () => {
-        toast("Start a new listing?", {
-            description: "Unsaved changes will be lost.",
-            action: {
-                label: "Yes, Clear Form",
-                onClick: () => {
-                    setData(INITIAL_DATA);
-                    router.push('/admin/listings/new');
-                }
-            },
-            cancel: {
-                label: "Cancel",
-                onClick: () => { }
-            }
-        });
+        if (confirm("Start a new listing? Unsaved changes will be lost.")) {
+            setData(INITIAL_DATA);
+            setUploadFiles([]);
+            router.push('/admin/listings/new');
+        }
     };
 
     return (
@@ -206,29 +191,40 @@ const CreateListingContent = () => {
                     </div>
                 </header>
 
-                <ListingForm data={data} onChange={setData} />
+                <ListingForm
+                    data={data}
+                    onChange={setData}
+                    onFilesAdded={handleFilesAdded}
+                />
 
-                {/* Footer Actions (Static at bottom of form) */}
+                {/* Footer Actions */}
                 <div className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-2 md:flex gap-3 items-center">
                     <button
                         onClick={handleSaveDraft}
-                        className="px-6 py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl shadow-sm hover:bg-gray-50 active:scale-95 transition-all text-sm"
+                        disabled={isSubmitting}
+                        className="px-6 py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl shadow-sm hover:bg-gray-50 active:scale-95 transition-all text-sm disabled:opacity-50"
                     >
                         Save Draft
                     </button>
 
                     <button
                         onClick={handleAddAnother}
-                        className="px-6 py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl shadow-sm hover:bg-gray-50 active:scale-95 transition-all text-sm"
+                        disabled={isSubmitting}
+                        className="px-6 py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl shadow-sm hover:bg-gray-50 active:scale-95 transition-all text-sm disabled:opacity-50"
                     >
                         + Add Another
                     </button>
 
                     <button
                         onClick={handlePublish}
-                        className="col-span-2 md:col-span-1 px-8 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all text-sm flex items-center justify-center gap-2"
+                        disabled={isSubmitting}
+                        className="col-span-2 md:col-span-1 px-8 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 active:scale-95 transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50"
                     >
-                        Publish Listing
+                        {isSubmitting ? (
+                            <>Uploading...</>
+                        ) : (
+                            <>Publish Listing</>
+                        )}
                     </button>
                 </div>
             </div>

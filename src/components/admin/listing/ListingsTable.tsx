@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { MoreHorizontal, Share2, Edit, Trash2, CheckCircle } from "lucide-react";
-import { Listing } from "@/lib/mock-db";
+// import { Listing } from "@/lib/mock-db";
 import FlyerModal from "./FlyerModal";
 import CarPlaceholder from "@/components/ui/CarPlaceholder";
 import ImageWithError from "@/components/ui/ImageWithError";
@@ -15,15 +15,15 @@ const STATUS_STYLES = {
 };
 
 interface ListingsTableProps {
-    listings: Listing[];
-    onEdit: (listing: Listing) => void;
+    listings: any[];
+    onEdit: (listing: any) => void;
     onDelete: (id: string) => void;
-    onUpdate?: (id: string, updates: Partial<Listing>) => void;
+    onUpdate?: (id: string, updates: Partial<any>) => void;
 }
 
 export default function ListingsTable({ listings, onEdit, onDelete, onUpdate }: ListingsTableProps) {
     const [filter, setFilter] = useState('all');
-    const [activeFlyerListing, setActiveFlyerListing] = useState<Listing | null>(null);
+    const [activeFlyerListing, setActiveFlyerListing] = useState<any | null>(null);
 
     const filteredListings = listings.filter(l => filter === 'all' || l.status === filter);
 
@@ -81,7 +81,7 @@ export default function ListingsTable({ listings, onEdit, onDelete, onUpdate }: 
                                     <div>
                                         <div className="flex justify-between items-start mb-1">
                                             <div className="font-bold text-gray-900 truncate pr-6">
-                                                {item.name}
+                                                {item.make || item.name} {item.model}
                                             </div>
                                             <div className="flex -mt-2 -mr-2">
                                                 <button
@@ -97,7 +97,7 @@ export default function ListingsTable({ listings, onEdit, onDelete, onUpdate }: 
                                             </div>
                                         </div>
                                         <div className="text-xs text-gray-400 font-medium mb-2">
-                                            {item.specs.year} • #{1000 + parseInt(item.id)}
+                                            {item.year || item.specs?.year} • #{1000 + (parseInt(item.id) || 0)}
                                         </div>
                                     </div>
 
@@ -121,8 +121,8 @@ export default function ListingsTable({ listings, onEdit, onDelete, onUpdate }: 
 
                                 {/* Vehicle */}
                                 <div>
-                                    <div className="font-bold text-gray-900">{item.name}</div>
-                                    <div className="text-xs text-gray-400 font-medium">{item.specs.year} • Stock #{1000 + parseInt(item.id)}</div>
+                                    <div className="font-bold text-gray-900">{item.make || item.name} {item.model}</div>
+                                    <div className="text-xs text-gray-400 font-medium">{item.year || item.specs?.year} • Stock #{1000 + (parseInt(item.id) || 0)}</div>
                                 </div>
 
                                 {/* Price */}
@@ -138,12 +138,12 @@ export default function ListingsTable({ listings, onEdit, onDelete, onUpdate }: 
                                 </div>
 
                                 {/* Date */}
-                                <div className="text-sm text-gray-500 font-medium">{item.dateAdded}</div>
+                                <div className="text-sm text-gray-500 font-medium">{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'N/A'}</div>
 
                                 {/* Actions */}
                                 <div className="flex justify-end relative gap-1">
                                     <button
-                                        onClick={() => onUpdate && onUpdate(item.id, { status: item.status === 'sold' ? 'arrived' : 'sold' })}
+                                        onClick={() => onUpdate && onUpdate(item.id, { status: item.status === 'sold' ? 'available' : 'sold' })}
                                         className={`p-2 rounded-lg transition-colors ${item.status === 'sold'
                                             ? 'text-green-600 hover:bg-green-50'
                                             : 'text-gray-400 hover:text-green-600 hover:bg-green-50'}`}

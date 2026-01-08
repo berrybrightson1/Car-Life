@@ -5,14 +5,16 @@ import { Upload, X, ShieldCheck, Ship, Info, Sparkles, Globe, GripVertical } fro
 import { useState } from "react";
 import { Reorder } from "framer-motion";
 import DescriptionGenerator from "@/components/admin/listing/DescriptionGenerator";
-import { CAR_CATEGORIES } from "@/lib/mock-db";
+import { CAR_CATEGORIES } from "@/lib/utils";
 
 export default function ListingForm({
     data,
-    onChange
+    onChange,
+    onFilesAdded
 }: {
     data: ListingData;
-    onChange: (d: ListingData) => void
+    onChange: (d: ListingData) => void;
+    onFilesAdded?: (files: File[]) => void;
 }) {
 
     const handleChange = (field: keyof ListingData, value: any) => {
@@ -45,8 +47,12 @@ export default function ListingForm({
                         // Handle dropped files
                         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                             const files = Array.from(e.dataTransfer.files);
-                            const newUrls = files.map(file => URL.createObjectURL(file));
-                            onChange({ ...data, images: [...data.images, ...newUrls] });
+                            if (onFilesAdded) {
+                                onFilesAdded(files);
+                            } else {
+                                const newUrls = files.map(file => URL.createObjectURL(file));
+                                onChange({ ...data, images: [...data.images, ...newUrls] });
+                            }
                         }
                     }}
                 >
@@ -60,8 +66,12 @@ export default function ListingForm({
                         onChange={(e) => {
                             if (e.target.files && e.target.files.length > 0) {
                                 const files = Array.from(e.target.files);
-                                const newUrls = files.map(file => URL.createObjectURL(file));
-                                onChange({ ...data, images: [...data.images, ...newUrls] });
+                                if (onFilesAdded) {
+                                    onFilesAdded(files);
+                                } else {
+                                    const newUrls = files.map(file => URL.createObjectURL(file));
+                                    onChange({ ...data, images: [...data.images, ...newUrls] });
+                                }
                             }
                         }}
                     />

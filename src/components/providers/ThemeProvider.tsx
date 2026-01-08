@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { MockDB } from "@/lib/mock-db";
+
 
 type Theme = "light" | "dark" | "system";
 
@@ -19,8 +19,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         setMounted(true);
         // Initial load
-        const stored = MockDB.getSettings().appearance?.theme || "light";
-        setThemeState(stored as Theme);
+        const stored = (localStorage.getItem("theme-preference") as Theme) || "light";
+        setThemeState(stored);
     }, []);
 
     useEffect(() => {
@@ -39,11 +39,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     const setTheme = (newTheme: Theme) => {
         setThemeState(newTheme);
-        // Persist
-        const settings = MockDB.getSettings();
-        if (!settings.appearance) settings.appearance = { theme: 'light', compactMode: false };
-        settings.appearance.theme = newTheme;
-        MockDB.saveSettings(settings); // This saves to localStorage
+        localStorage.setItem("theme-preference", newTheme);
 
         // Dispatch event for other tabs or legacy listeners
         if (typeof window !== 'undefined') {
@@ -54,8 +50,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Listen for cross-tab changes and existing event triggers
     useEffect(() => {
         const handleStorage = () => {
-            const stored = MockDB.getSettings().appearance?.theme || "light";
-            setThemeState(stored as Theme);
+            const stored = (localStorage.getItem("theme-preference") as Theme) || "light";
+            setThemeState(stored);
         };
         window.addEventListener('storage', handleStorage);
         window.addEventListener('theme-change', handleStorage);

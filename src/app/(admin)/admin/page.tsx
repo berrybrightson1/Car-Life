@@ -1,31 +1,51 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { DollarSign, ShoppingCart, Users, Activity, ExternalLink } from "lucide-react";
 import Link from "next/link";
-import { Order } from "@/lib/mock-db";
-import { getDashboardStats } from "@/app/actions/stats";
-import { getOrders } from "@/app/actions/orders";
-import { DollarSign, ShoppingCart, Users, Activity, ExternalLink, ArrowUpRight, Clock } from "lucide-react";
-import { motion } from "framer-motion";
-import SystemActivityLog from "@/components/admin/SystemActivityLog";
+import { getOrders, getDashboardStats } from "@/app/actions/logistics";
+import { useRouter } from "next/navigation";
+
+function StatCard({ title, value, icon: Icon, trend, color, bg }: any) {
+    return (
+        <div className={`p-6 rounded-[24px] border ${bg} relative overflow-hidden group hover:shadow-lg transition-all`}>
+            <div className={`w-12 h-12 rounded-2xl ${color.replace('text', 'bg').replace('700', '100')} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                <Icon size={24} className={color} />
+            </div>
+            <div className="relative z-10">
+                <p className="text-gray-500 font-bold text-xs uppercase tracking-wider mb-1">{title}</p>
+                <h3 className={`text-3xl font-black ${color} tracking-tight`}>{value}</h3>
+            </div>
+            {trend && (
+                <div className="absolute top-6 right-6 text-xs font-bold bg-white/50 px-2 py-1 rounded-lg backdrop-blur-sm">
+                    {trend}
+                </div>
+            )}
+        </div>
+    );
+}
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState({ total: 0, pending: 0, revenue: 0, inventory: 0 });
-    const [recentOrders, setRecentOrders] = useState<Order[]>([]);
+    const [recentOrders, setRecentOrders] = useState<any[]>([]);
 
     useEffect(() => {
         const loadData = async () => {
-            const [statsData, ordersData] = await Promise.all([
-                getDashboardStats(),
-                getOrders(),
-            ]);
-            setStats(statsData);
-            setRecentOrders(ordersData.slice(0, 5)); // Top 5 recent
+            try {
+                const [statsData, ordersData] = await Promise.all([
+                    getDashboardStats(),
+                    getOrders(),
+                ]);
+                setStats(statsData);
+                setRecentOrders(ordersData.slice(0, 5)); // Top 5 recent
+            } catch (error) {
+                console.error("Dashboard Load Error", error);
+            }
         };
 
         loadData();
         // Poll for "Real-time" effect
-        const interval = setInterval(loadData, 3000);
+        const interval = setInterval(loadData, 10000);
         return () => clearInterval(interval);
     }, []);
 
@@ -54,7 +74,7 @@ export default function AdminDashboard() {
                     title="Total Revenue"
                     value={`₵${stats.revenue.toLocaleString()}`}
                     icon={DollarSign}
-                    trend="+12%"
+                    trend="Est."
                     color="text-emerald-700"
                     bg="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-100"
                 />
@@ -75,10 +95,10 @@ export default function AdminDashboard() {
                     bg="bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-100"
                 />
                 <StatCard
-                    title="Conversion Rate"
-                    value="2.4%"
+                    title="System Status"
+                    value="Online"
                     icon={Activity}
-                    trend="-0.1%"
+                    trend="100%"
                     color="text-orange-700"
                     bg="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-100"
                 />
@@ -109,32 +129,21 @@ export default function AdminDashboard() {
                                         <div className="w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center flex-shrink-0 text-xl">
                                             🚗
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center justify-between mb-1">
-                                                <h3 className="font-bold text-gray-900 truncate">
-                                                    New Order: {order.carDetails}
-                                                </h3>
-                                                <span className="text-xs font-bold text-gray-400 bg-white px-2 py-1 rounded-md border border-gray-100">
-                                                    {order.id}
-                                                </span>
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-start mb-1">
+                                                <h3 className="font-bold text-gray-900">{order.clientName}</h3>
+                                                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md">{order.status}</span>
                                             </div>
-                                            <p className="text-sm text-gray-500 mb-2">
-                                                From <span className="font-semibold text-gray-700">{order.dialCode} {order.customerPhone}</span>
-                                            </p>
-                                            <div className="flex gap-2">
-                                                <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
-                                                    {order.budget}
-                                                </span>
-                                                <span className="text-xs font-medium bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">
-                                                    {order.status}
-                                                </span>
+                                            <p className="text-sm text-gray-500 font-medium mb-1">Ordered: {order.carDetails || 'Custom Request'}</p>
+                                            <div className="flex items-center gap-2 text-xs text-gray-400">
+                                                <span>{new Date(order.createdAt).toLocaleDateString()}</span>
+                                                <span>•</span>
+                                                <span>{order.clientPhone}</span>
                                             </div>
                                         </div>
-                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button className="p-2 bg-white rounded-lg border border-gray-200 text-gray-400 hover:text-blue-600" aria-label="View order details">
-                                                <ExternalLink size={16} />
-                                            </button>
-                                        </div>
+                                        <button className="p-2 bg-white rounded-lg border border-gray-200 text-gray-400 hover:text-blue-600" aria-label="View order details">
+                                            <ExternalLink size={16} />
+                                        </button>
                                     </div>
                                 ))
                             )}
@@ -142,39 +151,21 @@ export default function AdminDashboard() {
                     </div>
                 </div>
 
-                {/* Right: System Activity Log */}
+                {/* Sidebar: Quick Actions or Mini-stats */}
                 <div className="space-y-6">
-                    <SystemActivityLog />
-
-                    <div className="bg-gradient-to-br from-gray-900 to-black rounded-[24px] p-6 text-white text-center shadow-xl shadow-gray-200">
-                        <h3 className="font-bold text-lg mb-2">Share Storefront</h3>
-                        <p className="text-gray-400 text-sm mb-6">Send your store link to more customers on WhatsApp.</p>
-                        <button className="w-full bg-white text-black py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors">
-                            <ExternalLink size={18} />
-                            Share Link
-                        </button>
+                    <div className="bg-black text-white rounded-[24px] p-6 relative overflow-hidden">
+                        <div className="relative z-10">
+                            <h3 className="text-xl font-bold mb-2">Creator Studio</h3>
+                            <p className="text-gray-400 text-sm mb-6">Manage listings and social assets.</p>
+                            <Link
+                                href="/admin/listings/new"
+                                className="w-full bg-white text-black py-3 rounded-xl font-bold text-center block"
+                            >
+                                Go to Studio
+                            </Link>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div >
-    );
-}
-
-function StatCard({ title, value, icon: Icon, trend, color, bg }: any) {
-    return (
-        <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-start justify-between mb-4">
-                <div className={`p-3 rounded-xl ${bg} ${color}`}>
-                    <Icon size={20} />
-                </div>
-                <div className="flex items-center gap-1 text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg">
-                    <ArrowUpRight size={12} />
-                    {trend}
-                </div>
-            </div>
-            <div>
-                <p className="text-gray-500 text-sm font-medium mb-1">{title}</p>
-                <h3 className="text-2xl font-black text-gray-900 tracking-tight">{value}</h3>
             </div>
         </div>
     );

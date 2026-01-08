@@ -1,16 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Package, MapPin, Truck, CheckCircle, Ship, ArrowRight, Loader, ChevronLeft } from "lucide-react";
-import { MockDB, Shipment } from "@/lib/mock-db";
+import { Search, Package, MapPin, Truck, Ship, ArrowRight, Loader, ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { getShipmentByWaybill } from "@/app/actions/logistics";
 
 export default function PublicTrackingPage() {
     const router = useRouter();
     const [trackingId, setTrackingId] = useState("");
-    const [result, setResult] = useState<Shipment | null>(null);
+    const [result, setResult] = useState<any | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
 
@@ -22,20 +22,29 @@ export default function PublicTrackingPage() {
         setHasSearched(true);
         setResult(null);
 
-        // Simulate API delay
-        setTimeout(() => {
-            const shipments = MockDB.getShipments();
-            // Case insensitive search
-            const found = shipments.find(s => s.id.toLowerCase() === trackingId.toLowerCase().trim() || s.waybill_id.toLowerCase() === trackingId.toLowerCase().trim());
+        try {
+            const shipment = await getShipmentByWaybill(trackingId.trim());
 
-            if (found) {
-                setResult(found);
+            if (shipment) {
+                setResult(shipment);
                 toast.success("Shipment found!");
             } else {
                 toast.error("Tracking ID not found. Please check and try again.");
             }
+        } catch (error) {
+            console.error(error);
+            toast.error("Error searching for shipment");
+        } finally {
             setIsLoading(false);
-        }, 1500);
+        }
+    };
+
+    // Helper to compute progress
+    const getProgress = (status: string) => {
+        const steps = ['procured', 'processing', 'at_port_origin', 'at_sea', 'arrived_port', 'customs', 'delivered'];
+        const idx = steps.indexOf(status.toLowerCase());
+        if (idx === -1) return 10;
+        return (idx / (steps.length - 1)) * 100;
     };
 
     return (
@@ -68,7 +77,7 @@ export default function PublicTrackingPage() {
                         <input
                             value={trackingId}
                             onChange={(e) => setTrackingId(e.target.value)}
-                            placeholder="e.g. TRK-ORD-1002"
+                            placeholder="e.g. TRK-SER-1234"
                             className="w-full h-14 pl-12 pr-4 rounded-xl outline-none font-bold text-lg text-gray-900 placeholder:text-gray-300"
                         />
                     </div>
@@ -94,10 +103,12 @@ export default function PublicTrackingPage() {
                                 <div className="absolute top-0 right-0 p-8 opacity-10"><Ship size={120} /></div>
                                 <div className="relative z-10">
                                     <div className="inline-block px-3 py-1 bg-white/20 backdrop-blur rounded-lg text-xs font-bold mb-4 border border-white/20">
-                                        {result.status.replace(/_/g, ' ').toUpperCase()}
+                                        {result.currentStatus.replace(/_/g, ' ').toUpperCase()}
                                     </div>
-                                    <h2 className="text-2xl md:text-3xl font-black mb-1">{result.vehicle}</h2>
-                                    <p className="opacity-80 font-medium">Tracking ID: {result.waybill_id}</p>
+                                    <h2 className="text-2xl md:text-3xl font-black mb-1">
+                                        {result.manualVehicle || "Vehicle Shipment"}
+                                    </h2>
+                                    <p className="opacity-80 font-medium">Tracking ID: {result.waybillId}</p>
                                 </div>
                             </div>
 
@@ -113,7 +124,7 @@ export default function PublicTrackingPage() {
                                     <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
                                         <div
                                             className="h-full bg-blue-600 rounded-full transition-all duration-1000 relative"
-                                            style={{ width: `${result.progress}%` }}
+                                            style={{ width: `${getProgress(result.currentStatus)}%` }}
                                         >
                                             <div className="absolute top-0 bottom-0 right-0 w-full animate-pulse bg-gradient-to-r from-transparent via-white/30 to-transparent" />
                                         </div>
@@ -127,28 +138,30 @@ export default function PublicTrackingPage() {
                                             <MapPin size={16} />
                                             <span className="text-xs font-bold uppercase">Origin</span>
                                         </div>
-                                        <div className="font-bold text-gray-900">{result.origin}</div>
+                                        <div className="font-bold text-gray-900">{result.originPort}</div>
                                     </div>
                                     <div className="text-right">
                                         <div className="flex items-center justify-end gap-2 text-gray-400 mb-1">
                                             <span className="text-xs font-bold uppercase">Destination</span>
                                             <MapPin size={16} />
                                         </div>
-                                        <div className="font-bold text-gray-900">{result.destination}</div>
+                                        <div className="font-bold text-gray-900">{result.destPort}</div>
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-2 text-gray-400 mb-1">
                                             <Truck size={16} />
                                             <span className="text-xs font-bold uppercase">ETA</span>
                                         </div>
-                                        <div className="font-bold text-blue-600">{result.eta}</div>
+                                        <div className="font-bold text-blue-600">
+                                            {result.eta ? new Date(result.eta).toLocaleDateString() : 'TBD'}
+                                        </div>
                                     </div>
                                     <div className="text-right">
                                         <div className="flex items-center justify-end gap-2 text-gray-400 mb-1">
                                             <span className="text-xs font-bold uppercase">Ref No.</span>
                                             <Package size={16} />
                                         </div>
-                                        <div className="font-bold text-gray-900">{result.bookingRef || 'N/A'}</div>
+                                        <div className="font-bold text-gray-900">{result.id.substring(0, 8).toUpperCase()}</div>
                                     </div>
                                 </div>
 
@@ -158,19 +171,23 @@ export default function PublicTrackingPage() {
                                         <ArrowRight className="bg-black text-white rounded-full p-1" size={20} />
                                         Latest Updates
                                     </h3>
-                                    <div className="space-y-8 relative pl-3 border-l-2 border-dashed border-gray-200 ml-2">
-                                        {result.updates.map((update, idx) => (
-                                            <div key={idx} className="relative pl-6">
-                                                <div className={`absolute -left-[21px] top-1 w-4 h-4 rounded-full border-4 border-white shadow-sm ${idx === 0 ? 'bg-blue-600' : 'bg-gray-300'}`} />
-                                                <div className={`font-bold ${idx === 0 ? 'text-gray-900 text-lg' : 'text-gray-500'}`}>
-                                                    {update.status_name}
+                                    {result.events && result.events.length > 0 ? (
+                                        <div className="space-y-8 relative pl-3 border-l-2 border-dashed border-gray-200 ml-2">
+                                            {result.events.map((update: any, idx: number) => (
+                                                <div key={idx} className="relative pl-6">
+                                                    <div className={`absolute -left-[21px] top-1 w-4 h-4 rounded-full border-4 border-white shadow-sm ${idx === 0 ? 'bg-blue-600' : 'bg-gray-300'}`} />
+                                                    <div className={`font-bold ${idx === 0 ? 'text-gray-900 text-lg' : 'text-gray-500'}`}>
+                                                        {update.status}
+                                                    </div>
+                                                    <div className="text-sm text-gray-400 font-medium">
+                                                        {update.location} • {new Date(update.timestamp).toLocaleDateString()}
+                                                    </div>
                                                 </div>
-                                                <div className="text-sm text-gray-400 font-medium">
-                                                    {update.location} • {new Date(update.timestamp).toLocaleDateString()}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-gray-400 text-sm">No specific updates yet.</div>
+                                    )}
                                 </div>
                             </div>
                         </motion.div>

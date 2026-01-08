@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import CarPlaceholder from "@/components/ui/CarPlaceholder";
-import { Listing } from "@/lib/mock-db";
+// import { Listing } from "@/lib/mock-db";
 
-export default function ImageWithError({ car, className = "w-full h-full object-cover" }: { car: Listing, className?: string }) {
+export default function ImageWithError({ car, className = "w-full h-full object-cover" }: { car: any, className?: string }) {
     const [error, setError] = useState(false);
     const [loaded, setLoaded] = useState(false);
 

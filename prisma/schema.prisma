@@ -19,6 +19,15 @@ model Car {
   status      String   @default("AVAILABLE") // Options: AVAILABLE, SOLD, RESERVED
   images      String[] // Holds list of image URLs
   
+  // Specs / Details
+  description String?  @db.Text
+  category    String   @default("Uncategorized")
+  fuel        String?
+  transmission String?
+  mileage     String?
+  color       String?
+  condition   String?  @default("Foreign Used")
+
   // Relations: A car can be in a Shipment or an Order
   shipment    Shipment?
   order       Order?
@@ -66,6 +75,7 @@ model Shipment {
   // OPTION B: If Procurement Service (Manual Details)
   manualVehicle String?  // e.g. "2024 Honda Civic"
   manualClient  String?
+  eta           DateTime? // Added for tracking
   
   // History & Notes
   events        ShipmentEvent[]

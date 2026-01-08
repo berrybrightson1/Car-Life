@@ -3,7 +3,7 @@
 import { X, Download, Copy, MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Listing } from "@/lib/mock-db";
+// import { Listing } from "@/lib/mock-db";
 import { toast } from "sonner";
 
 export default function FlyerModal({
@@ -11,7 +11,7 @@ export default function FlyerModal({
     isOpen,
     onClose
 }: {
-    listing: Listing | null;
+    listing: any | null;
     isOpen: boolean;
     onClose: () => void;
 }) {
@@ -47,7 +47,7 @@ export default function FlyerModal({
                         <div className="h-[55%] relative w-full bg-gray-100">
                             <img
                                 src={listing.images?.[0] || listing.image}
-                                alt={listing.name}
+                                alt={listing.make || listing.name}
                                 className="w-full h-full object-cover"
                             />
 
@@ -64,7 +64,7 @@ export default function FlyerModal({
                             <div className="flex justify-between items-start mb-6">
                                 <div className="flex-1 pr-4">
                                     <h1 className="text-[28px] leading-[1.1] font-bold text-slate-900 tracking-tight">
-                                        {listing.name} {listing.specs.year}
+                                        {listing.make || listing.name} {listing.model} {listing.year || listing.specs?.year}
                                     </h1>
                                 </div>
                                 <div className="bg-[#2563EB] text-white px-5 py-2 rounded-full font-bold text-xl shadow-blue-200/50 shadow-lg whitespace-nowrap">
@@ -76,14 +76,14 @@ export default function FlyerModal({
                             <div className="flex flex-wrap gap-2 mb-8">
                                 <span className="bg-slate-50 text-slate-600 px-4 py-2 rounded-lg font-semibold text-sm border border-slate-100 flex items-center gap-2">
                                     <svg className="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M2 12h20" /></svg>
-                                    {listing.specs.fuel}
+                                    {listing.fuel || listing.specs?.fuel}
                                 </span>
                                 <span className="bg-slate-50 text-slate-600 px-4 py-2 rounded-lg font-semibold text-sm border border-slate-100 flex items-center gap-2">
                                     <svg className="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
-                                    {listing.specs.transmission}
+                                    {listing.transmission || listing.specs?.transmission}
                                 </span>
                                 <span className="bg-slate-50 text-slate-600 px-4 py-2 rounded-lg font-semibold text-sm border border-slate-100">
-                                    Details {listing.specs.year}
+                                    Details {listing.year || listing.specs?.year}
                                 </span>
                             </div>
 

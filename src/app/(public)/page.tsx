@@ -2,45 +2,47 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import FeedCard from "@/components/mobile/FeedCard";
 import StoreSearch from "@/components/store/StoreSearch";
 import IOSNavigationStack from "@/components/mobile/IOSNavigationStack";
 import CarDetailView from "@/components/mobile/CarDetailView";
-
-import { Listing, CAR_CATEGORIES } from "@/lib/mock-db";
 import { getListings } from "@/app/actions/listings";
 import ShippingCountries from "@/components/store/ShippingCountries";
 
 export default function StorePage() {
-    const [listings, setListings] = useState<Listing[]>([]);
+    const [listings, setListings] = useState<any[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("All");
     const [conditionFilter, setConditionFilter] = useState<'All' | 'Brand New' | 'Foreign Used'>('All');
-    const [selectedCar, setSelectedCar] = useState<Listing | null>(null);
+    const [selectedCar, setSelectedCar] = useState<any | null>(null);
 
     useEffect(() => {
         // Initial load
         const loadListings = async () => {
-            const data = await getListings();
-            setListings(data);
+            try {
+                const data = await getListings();
+                setListings(data);
+            } catch (e) {
+                console.error("Failed to load listings", e);
+            }
         };
         loadListings();
 
-        // Poll for updates (Real-time syncing with admin)
+        // Poll for update
         const interval = setInterval(() => {
             loadListings();
-        }, 1500);
+        }, 5000); // 5 sec poll
 
         return () => clearInterval(interval);
     }, []);
 
     const filteredCars = listings.filter(car => {
-        const isPublished = car.status !== 'draft';
-        const matchesCategory = categoryFilter === 'All' || car.type === categoryFilter;
-        const matchesSearch = car.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (car.specs?.year || '').includes(searchQuery);
-        const matchesCondition = conditionFilter === 'All' || car.specs?.condition === conditionFilter;
+        const isPublished = car.status !== 'draft'; // Draft check if server returns drafts
+        const matchesCategory = categoryFilter === 'All' || car.category === categoryFilter;
+        // Search against Make/Model/Year
+        const fullName = `${car.make} ${car.model} ${car.year}`.toLowerCase();
+        const matchesSearch = fullName.includes(searchQuery.toLowerCase());
+        const matchesCondition = conditionFilter === 'All' || car.condition === conditionFilter;
 
         return isPublished && matchesCategory && matchesSearch && matchesCondition;
     });
