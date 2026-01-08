@@ -108,7 +108,7 @@ export default function CarDetailView({ car, onBack }: CarDetailViewProps) {
                 {/* Dot Indicators */}
                 {images.length > 1 && (
                     <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
-                        {images.map((_, idx) => (
+                        {images.map((_: any, idx: number) => (
                             <button
                                 key={idx}
                                 onClick={() => setActiveImageIndex(idx)}
