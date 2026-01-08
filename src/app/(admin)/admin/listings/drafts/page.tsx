@@ -54,6 +54,7 @@ export default function DraftsPage() {
                                 <button
                                     onClick={() => deleteDraft(draft.id)}
                                     className="text-gray-300 hover:text-red-500 transition-colors p-1"
+                                    aria-label="Delete draft"
                                 >
                                     <Trash2 size={16} />
                                 </button>

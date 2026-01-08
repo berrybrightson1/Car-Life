@@ -87,10 +87,11 @@ export default function ListingsTable({ listings, onEdit, onDelete, onUpdate }: 
                                                 <button
                                                     onClick={() => setActiveFlyerListing(item)}
                                                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                                                    aria-label="Share flyer"
                                                 >
                                                     <Share2 size={18} />
                                                 </button>
-                                                <button onClick={() => onEdit(item)} className="text-gray-400 p-2 hover:text-gray-900">
+                                                <button onClick={() => onEdit(item)} className="text-gray-400 p-2 hover:text-gray-900" aria-label="Edit listing">
                                                     <Edit size={18} />
                                                 </button>
                                             </div>

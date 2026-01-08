@@ -86,12 +86,14 @@ export default function CarDetailView({ car, onBack }: CarDetailViewProps) {
                         <button
                             onClick={(e) => { e.stopPropagation(); handlePrev(); }}
                             className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white backdrop-blur-sm transition-all active:scale-95"
+                            aria-label="Previous image"
                         >
                             <ChevronLeft size={24} />
                         </button>
                         <button
                             onClick={(e) => { e.stopPropagation(); handleNext(); }}
                             className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white backdrop-blur-sm transition-all active:scale-95"
+                            aria-label="Next image"
                         >
                             <ChevronRight size={24} />
                         </button>
@@ -109,6 +111,7 @@ export default function CarDetailView({ car, onBack }: CarDetailViewProps) {
                                     ? "bg-white w-4"
                                     : "bg-white/50 hover:bg-white/80"
                                     }`}
+                                aria-label={`View image ${idx + 1}`}
                             />
                         ))}
                     </div>

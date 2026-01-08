@@ -261,17 +261,17 @@ function AddShipmentModal({ onClose, onSave }: { onClose: () => void, onSave: ()
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-500 uppercase">Origin Port</label>
-                            <input name="origin" required defaultValue="Dubai Auto Zone" className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 font-medium outline-none focus:ring-2 focus:ring-black" />
+                            <input name="origin" required defaultValue="Dubai Auto Zone" className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 font-medium outline-none focus:ring-2 focus:ring-black" aria-label="Origin Port" />
                         </div>
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-500 uppercase">Destination Port</label>
-                            <input name="destination" required defaultValue="Tema Port" className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 font-medium outline-none focus:ring-2 focus:ring-black" />
+                            <input name="destination" required defaultValue="Tema Port" className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 font-medium outline-none focus:ring-2 focus:ring-black" aria-label="Destination Port" />
                         </div>
                     </div>
 
                     <div className="space-y-1">
                         <label className="text-xs font-bold text-gray-500 uppercase">Estimated Arrival (ETA)</label>
-                        <input name="eta" type="date" required className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 font-medium outline-none focus:ring-2 focus:ring-black" />
+                        <input name="eta" type="date" required className="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 font-medium outline-none focus:ring-2 focus:ring-black" aria-label="Estimated Arrival" />
                     </div>
 
                     <button type="submit" className="w-full bg-black text-white py-4 rounded-xl font-bold hover:bg-gray-900 transition-colors">

@@ -56,6 +56,7 @@ export default function ListingForm({
                         multiple
                         accept="image/*"
                         className="hidden"
+                        aria-label="Upload vehicle images"
                         onChange={(e) => {
                             if (e.target.files && e.target.files.length > 0) {
                                 const files = Array.from(e.target.files);
@@ -159,8 +160,8 @@ export default function ListingForm({
                                 type="button"
                                 onClick={() => handleChange('type', cat)}
                                 className={`px-4 py-2 rounded-full text-xs font-bold border transition-all ${data.type === cat
-                                        ? 'bg-black text-white border-black shadow-lg'
-                                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                                    ? 'bg-black text-white border-black shadow-lg'
+                                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
                                     }`}
                             >
                                 {cat}

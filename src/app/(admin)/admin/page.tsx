@@ -131,7 +131,7 @@ export default function AdminDashboard() {
                                             </div>
                                         </div>
                                         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button className="p-2 bg-white rounded-lg border border-gray-200 text-gray-400 hover:text-blue-600">
+                                            <button className="p-2 bg-white rounded-lg border border-gray-200 text-gray-400 hover:text-blue-600" aria-label="View order details">
                                                 <ExternalLink size={16} />
                                             </button>
                                         </div>
