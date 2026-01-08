@@ -8,7 +8,8 @@ import StoreSearch from "@/components/store/StoreSearch";
 import IOSNavigationStack from "@/components/mobile/IOSNavigationStack";
 import CarDetailView from "@/components/mobile/CarDetailView";
 
-import { MockDB, Listing, CAR_CATEGORIES } from "@/lib/mock-db";
+import { Listing, CAR_CATEGORIES } from "@/lib/mock-db";
+import { getListings } from "@/app/actions/listings";
 import ShippingCountries from "@/components/store/ShippingCountries";
 
 export default function StorePage() {
@@ -20,11 +21,15 @@ export default function StorePage() {
 
     useEffect(() => {
         // Initial load
-        setListings(MockDB.getListings());
+        const loadListings = async () => {
+            const data = await getListings();
+            setListings(data);
+        };
+        loadListings();
 
         // Poll for updates (Real-time syncing with admin)
         const interval = setInterval(() => {
-            setListings(MockDB.getListings());
+            loadListings();
         }, 1500);
 
         return () => clearInterval(interval);

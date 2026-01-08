@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Plus, Search, Filter, MoreVertical, Edit, Trash2, Eye } from "lucide-react";
-import { MockDB, Listing } from "@/lib/mock-db";
+import { Listing } from "@/lib/mock-db";
+import { getListings, deleteListing, updateListing } from "@/app/actions/listings";
 import { toast } from "sonner";
 import ListingsTable from "@/components/admin/listing/ListingsTable";
 
@@ -15,11 +16,15 @@ export default function ListingsPage() {
 
     useEffect(() => {
         // Initial load
-        setListings(MockDB.getListings());
+        const loadListings = async () => {
+            const data = await getListings();
+            setListings(data);
+        };
+        loadListings();
 
         // Poll for updates (poor man's real-time)
         const interval = setInterval(() => {
-            setListings(MockDB.getListings());
+            loadListings();
         }, 2000);
 
         return () => clearInterval(interval);
@@ -68,14 +73,15 @@ export default function ListingsPage() {
                 {/* Table Component */}
                 <ListingsTable
                     listings={filteredCars}
-                    onDelete={(id) => {
+                    onDelete={async (id) => {
                         toast("Are you sure?", {
                             description: "This listing will be permanently deleted.",
                             action: {
                                 label: "Delete",
-                                onClick: () => {
-                                    MockDB.deleteListing(id);
-                                    setListings(MockDB.getListings());
+                                onClick: async () => {
+                                    await deleteListing(id);
+                                    const updated = await getListings();
+                                    setListings(updated);
                                     toast.success("Listing deleted");
                                 }
                             },
@@ -85,9 +91,10 @@ export default function ListingsPage() {
                             }
                         });
                     }}
-                    onUpdate={(id, updates) => {
-                        MockDB.updateListing(id, updates);
-                        setListings(MockDB.getListings());
+                    onUpdate={async (id, updates) => {
+                        await updateListing(id, updates);
+                        const updated = await getListings();
+                        setListings(updated);
                         toast.success("Listing updated");
                     }}
                     onEdit={(car) => {

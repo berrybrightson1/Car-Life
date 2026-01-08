@@ -4,7 +4,7 @@ import { X, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CountrySelect, { COUNTRIES } from "@/components/ui/CountrySelect";
-import { MockDB } from "@/lib/mock-db";
+import { createOrder } from "@/app/actions/orders";
 
 export default function OrderCustomModal({
     isOpen,
@@ -23,9 +23,9 @@ export default function OrderCustomModal({
         dialCode: COUNTRIES[0].dial
     });
 
-    const handleSend = () => {
-        // Save to Mock DB for Admin persistence
-        const orderId = MockDB.saveOrder({
+    const handleSend = async () => {
+        // Save to database for Admin persistence
+        const order = await createOrder({
             customerName: "Guest User", // We could add a name field later
             customerPhone: request.customerPhone,
             customerEmail: request.customerEmail,
@@ -39,7 +39,7 @@ export default function OrderCustomModal({
         const fullCustomerPhone = `${request.dialCode} ${request.customerPhone}`;
 
         // Include Unique Order ID in the message
-        const text = `Hi, I want to order a custom car:%0A%0A🆔 *Order ID: ${orderId}*%0A🚗 *${request.make} ${request.model}*%0A💰 Budget: ${request.budget}%0A📝 Notes: ${request.notes}%0A%0A👤 *Customer Details:*%0A📞 Phone: ${fullCustomerPhone}%0A📧 Email: ${request.customerEmail}`;
+        const text = `Hi, I want to order a custom car:%0A%0A🆔 *Order ID: ${order.id}*%0A🚗 *${request.make} ${request.model}*%0A💰 Budget: ${request.budget}%0A📝 Notes: ${request.notes}%0A%0A👤 *Customer Details:*%0A📞 Phone: ${fullCustomerPhone}%0A📧 Email: ${request.customerEmail}`;
 
         window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
         onClose();

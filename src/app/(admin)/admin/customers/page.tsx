@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MockDB, Order } from "@/lib/mock-db";
+import { Order } from "@/lib/mock-db";
+import { getOrders } from "@/app/actions/orders";
 import { Search, Filter, MoreVertical, Phone, Mail, Car } from "lucide-react";
 
 export default function CustomersPage() {
@@ -9,12 +10,16 @@ export default function CustomersPage() {
     const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
-        // Load data from "DB"
-        setOrders(MockDB.getOrders());
+        // Load data from database
+        const loadOrders = async () => {
+            const data = await getOrders();
+            setOrders(data);
+        };
+        loadOrders();
 
         // Poll for updates (since we don't have real sockets)
         const interval = setInterval(() => {
-            setOrders(MockDB.getOrders());
+            loadOrders();
         }, 5000);
         return () => clearInterval(interval);
     }, []);
@@ -133,8 +138,8 @@ export default function CustomersPage() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${order.status === 'Pending'
-                                                    ? 'bg-yellow-50 text-yellow-700 border-yellow-100'
-                                                    : 'bg-green-50 text-green-700 border-green-100'
+                                                ? 'bg-yellow-50 text-yellow-700 border-yellow-100'
+                                                : 'bg-green-50 text-green-700 border-green-100'
                                                 }`}>
                                                 {order.status}
                                             </span>

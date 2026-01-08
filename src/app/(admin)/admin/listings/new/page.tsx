@@ -8,7 +8,8 @@ import { toast } from "sonner";
 import MobilePreview from "@/components/admin/listing/MobilePreview";
 import ListingForm from "@/components/admin/listing/ListingForm";
 import MobileAssistiveTouch from "@/components/admin/listing/MobileAssistiveTouch";
-import { MockDB, CarCategory } from "@/lib/mock-db";
+import { CarCategory } from "@/lib/mock-db";
+import { createListing } from "@/app/actions/listings";
 
 export type ListingData = {
     make: string;
@@ -134,7 +135,16 @@ const CreateListingContent = () => {
                 return img;
             }));
 
-            MockDB.saveListing({ ...data, images: processedImages });
+            // Save to database
+            await createListing({
+                make: data.make,
+                model: data.model,
+                year: parseInt(data.specs.year),
+                price: parseFloat(data.price.replace(/[^0-9.]/g, '')),
+                images: processedImages,
+                status: data.status,
+            });
+
             toast.dismiss(toastId);
             toast.success("Listing Published to Marketplace!");
             setData(INITIAL_DATA);

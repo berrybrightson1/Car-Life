@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { MockDB, Order } from "@/lib/mock-db";
+import { Order } from "@/lib/mock-db";
+import { getDashboardStats } from "@/app/actions/stats";
+import { getOrders } from "@/app/actions/orders";
 import { DollarSign, ShoppingCart, Users, Activity, ExternalLink, ArrowUpRight, Clock } from "lucide-react";
 import { motion } from "framer-motion";
 import SystemActivityLog from "@/components/admin/SystemActivityLog";
@@ -12,10 +14,13 @@ export default function AdminDashboard() {
     const [recentOrders, setRecentOrders] = useState<Order[]>([]);
 
     useEffect(() => {
-        const loadData = () => {
-            setStats(MockDB.getStats());
-            const orders = MockDB.getOrders();
-            setRecentOrders(orders.slice(0, 5)); // Top 5 recent
+        const loadData = async () => {
+            const [statsData, ordersData] = await Promise.all([
+                getDashboardStats(),
+                getOrders(),
+            ]);
+            setStats(statsData);
+            setRecentOrders(ordersData.slice(0, 5)); // Top 5 recent
         };
 
         loadData();
