@@ -1,0 +1,97 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// --- 1. THE CARS (Inventory) ---
+model Car {
+  id          String   @id @default(cuid())
+  make        String
+  model       String
+  year        Int
+  price       Decimal  @db.Decimal(10, 2)
+  vin         String?  @unique
+  status      String   @default("AVAILABLE") // Options: AVAILABLE, SOLD, RESERVED
+  images      String[] // Holds list of image URLs
+  
+  // Relations: A car can be in a Shipment or an Order
+  shipment    Shipment?
+  order       Order?
+  
+  createdAt   DateTime @default(now())
+}
+
+// --- 2. THE SALES (Orders) ---
+model Order {
+  id          String   @id @default(cuid())
+  orderNumber String   @unique // The "ORD-9921" ID
+  clientName  String
+  clientPhone String
+  amount      Decimal  @db.Decimal(10, 2)
+  status      String   @default("PENDING") // PENDING, CONFIRMED, PAID
+  
+  // Link to Car (optional - some orders are just inquiries)
+  carId       String?   @unique
+  car         Car?      @relation(fields: [carId], references: [id])
+  
+  // Link to Shipment (If the order is being shipped)
+  shipment    Shipment?
+  
+  createdAt   DateTime @default(now())
+}
+
+// --- 3. THE LOGISTICS (Shipments) ---
+model Shipment {
+  id            String   @id @default(cuid())
+  waybillId     String   @unique // The Tracking ID (TRK-ORD-xxx)
+  type          String   // "INVENTORY" or "SERVICE"
+  currentStatus String   // PROCESSING, ON_HIGH_SEAS, AT_PORT, CLEARED
+  
+  originPort    String
+  destPort      String
+  
+  // OPTION A: If Shipping an existing Order
+  orderId       String?  @unique
+  order         Order?   @relation(fields: [orderId], references: [id])
+  
+  // Link to Car (if tracking a specific inventory car)
+  carId         String?  @unique
+  car           Car?     @relation(fields: [carId], references: [id])
+  
+  // OPTION B: If Procurement Service (Manual Details)
+  manualVehicle String?  // e.g. "2024 Honda Civic"
+  manualClient  String?
+  
+  // History & Notes
+  events        ShipmentEvent[]
+  logs          CommLog[]
+  
+  createdAt     DateTime @default(now())
+}
+
+// --- 4. TRACKING HISTORY (The Timeline) ---
+model ShipmentEvent {
+  id          String   @id @default(cuid())
+  statusLabel String   // e.g. "Vessel Departed"
+  location    String   // e.g. "Dubai Port"
+  timestamp   DateTime @default(now())
+  
+  shipmentId  String
+  shipment    Shipment @relation(fields: [shipmentId], references: [id])
+}
+
+// --- 5. CRM NOTES (Admin Logs) ---
+model CommLog {
+  id          String   @id @default(cuid())
+  note        String   @db.Text
+  isInternal  Boolean  @default(true) // true = Only Admin sees it
+  
+  shipmentId  String
+  shipment    Shipment @relation(fields: [shipmentId], references: [id])
+  createdAt   DateTime @default(now())
+}
